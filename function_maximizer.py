@@ -16,8 +16,10 @@
 import operator
 import random
 import time
-
-# to calculate the values of each individual
+"""
+    to calculate the values of each individual -- returns a dictionary containing the value of each indivdual's
+                                                  variables run through the equation
+"""
 def calculate_values(pop, contents) :
     sum_dict = {}
     #print(contents)
@@ -57,13 +59,13 @@ def calculate_values(pop, contents) :
         #time.sleep(10)
         sum_dict[key] = sum
     return sum_dict
-
-# to evaluate the fitness of each population
+"""
+    to evaluate the fitness of each population -- retuns a tuple where the first element is the new population and the
+                                                  second is the best individual in the population
+"""
 def evaluate(pop) :
     print('=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=')
     print(pop)
-    # get length of each bit string, this will be used later
-    bit_length = len(pop[0])
     # evaluate the individual
     sum_dict = calculate_values(pop, contents4)
     print('The sums: ' + str(sum_dict))
@@ -103,7 +105,7 @@ def evaluate(pop) :
     end = max(x, y)
     #print('Slicing from ' + str(start) + ' to ' + str(end))
 
-    # each individual will get a portion of one of the two top individuals
+    # each individual may get a portion of one of the two top individuals
     # the top two individuals may remain the same, but that's fine
     for i in range(num_individuals) :
         j = random.randint(0, 1)
@@ -119,18 +121,20 @@ def evaluate(pop) :
     for idv, value in cross_pop.items() :
         mut_pop[idv] = ''
         for i in range(len(value)) :
-            # every bit will have a small chance of being flipped
-            mut_chance = random.randint(0, 50)
-            if mut_chance == 0:
-                if cross_pop[idv][i] == '0':
-                    mut_pop[idv] += '1'
-                else:
-                    mut_pop[idv] += '0'
-                mut_pop[idv] += cross_pop[idv][i]
-            else:
-                mut_pop[idv] += cross_pop[idv][i]
             if len(mut_pop[idv]) == bit_length:
                 break
+            # every bit will have a small chance of being flipped -- various testing has convinved me that a 1/50 chance
+            # is optimal
+            else :
+                mut_chance = random.randint(0, 50)
+                if mut_chance == 0:
+                    if cross_pop[idv][i] == '0':
+                        mut_pop[idv] += '1'
+                    else:
+                        mut_pop[idv] += '0'
+                    mut_pop[idv] += cross_pop[idv][i]
+                else:
+                    mut_pop[idv] += cross_pop[idv][i]
     #print('After mutation:  ' + str(mut_pop))
     return mut_pop, best
 
@@ -140,7 +144,7 @@ def evaluate(pop) :
 
 print('Welcome to Eli\'s function maximizer! Please enter the text file you want read: ', end='')
 filename = input().strip()
-generations = 30
+generations = 1000
 num_individuals = 100
 
 try :
@@ -167,12 +171,16 @@ try :
                 pop[key] += str(random.randint(0, 1)) + str(random.randint(0, 1)) + str(random.randint(0, 1)) + str(random.randint(0, 1))
             print(pop[key])
 
+        # get length of each bit string, this will be used later
+        bit_length = len(pop[0])
+
         # run the algorithm
         for i in range(generations) :
             pop, best = evaluate(pop)
             print('The new population: ' + str(pop))
             print('The best performing individual: ' + best)
-            time.sleep(1)
+            # uncomment for periodic updates
+            #time.sleep(1)
 
         # using the best binary number, print the best set of variables found
         best_dict = {}
